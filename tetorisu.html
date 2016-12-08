@@ -1,0 +1,511 @@
+<html><head><title>テトリス</title>
+
+</head>
+<Body>
+
+
+
+
+<script language="JavaScript"><!--
+
+// --></script>
+
+
+<div style="display:none">
+	<div id="midori" style="position:absolute;width:33px;height:33px;background-color:#000"><!--緑のフィールド-->
+		<div style="position:relative;top:1px;left:1px;width:31px;height:31px;background-color:#0e0">
+		</div>
+	</div>
+	
+	<div id="kuro" style="position:absolute;width:33px;height:33px;background-color:#000"><!--画面の壁-->
+		<div style="position:relative;top:1px;left:1px;width:31px;height:31px;background-color:#333">
+		</div>
+	</div>
+
+	<div id="aka"class="block" style="position:absolute;width:33px;height:33px;background-color:#000"><!--ブロックの色、赤-->
+		<div style="position:relative;top:1px;left:1px;width:31px;height:31px;background-color:#f00">
+		</div>
+	</div>
+
+	<div id="roku" style="position:absolute;width:193px;left:70px;height:193px;"><!--ブロック存在範囲色を消したら周りの枠が消えた-->
+
+	</div>
+
+
+</div>
+
+<div style="position:relative;top:-10px;width:609px;height:545px;background-color:#f00" id="board">
+
+</div>
+
+	<div id="nextblockhint" style="position:absolute;width:200px;height:200px;background-color:#000">
+	<img style="display:block;position:relative;top:2px;left:2px;width:196px;height:196px" src="">
+	</div>
+
+	<div id="menu1" style="position:absolute;width:200px;height:80px;background-color:#f59" >
+		<div style="width:140px;font-size:30;margin-top:25px;text-align: right;" ><font id="ten">0</font>点</div>
+	</div>
+
+	<div id="menu2" style="position:absolute;width:200px;height:80px;background-color:#f59" >
+	
+	</div>
+
+	<div id="menu3" style="position:absolute;width:200px;height:80px;background-color:#f59" >
+	
+	</div>
+
+	<div id="menu" style="position:absolute;width:240px;height:545px;background-color:#ff0" >
+	
+
+
+
+	</div>
+
+
+<script language="JavaScript">
+<!--
+map=[
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],//当たり判定用のマップ
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],//1の部分を2に変えたほうがよさげ
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
+
+			//ブロックを三次配列で保存
+var block=[	[[0,1,0,0,0,0],[0,0,1,1,0,0],[0,1,0,0,0,0],[0,0,1,1,0,0],[0,1,0,0,0,0],[0,0,1,1,0,0]],
+		[[0,0,0,0,0,0],[0,0,0,1,0,0],[0,0,0,1,0,0],[0,0,0,1,0,0],[0,0,1,0,0,0],[0,1,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,1,0,1,0,0],[0,1,0,1,0,0],[0,0,0,1,0,0],[0,0,0,1,0,0],[0,0,1,0,0,0]],
+		[[0,0,0,0,0,0],[1,1,1,1,1,0],[0,0,0,1,0,0],[0,0,1,0,0,0],[0,1,0,1,0,0],[1,0,0,0,1,0]],//2:29 2011/03/09
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,1,0,0],[0,0,0,1,0,0],[0,0,0,1,0,0],[0,0,0,0,0,0]],//ここから普通のやつ
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,1,0,0],[0,0,1,0,0,0],[0,0,1,0,0,0],[0,0,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,1,0,0],[0,0,1,1,0,0],[0,0,1,0,0,0],[0,0,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,0,1,0,0,0],[0,0,1,0,0,0],[0,0,1,0,0,0],[0,0,1,0,0,0],[0,0,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,1,0,0],[0,0,1,1,0,0],[0,0,0,1,0,0],[0,0,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,0,0,0],[0,0,1,1,0,0],[0,0,0,1,0,0],[0,0,0,0,0,0]],
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,1,0,0],[0,0,1,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],//2:45 2011/03/09
+		[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,1,1,0],[0,0,1,1,1,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]//デバッグ用3:36 2011/03/09
+	];
+
+var imab=[[],[],[],[],[],[]];//落下中のブロックの形状を保存
+
+	var roku=document.getElementById("roku");//ブロックが存在すべき空間を作成
+	var rokucp=roku.cloneNode(true);
+	rokucp.style.position="absolute";
+	//rokucp.style.filter = 'alpha(opacity=50)';
+	rokucp.style.MozOpacity = 0.5;
+	rokucp.style.opacity = 0.5;
+
+var n =0;//このnの値によってブロックの形状が決まる
+var kotei=0;//これが3になったら、ブロックを固定する
+//var imanotakasa;//otiruでkoteiカウントのリセットに使う//使わない疑惑5:01 2011/03/12
+//var maenotakasa;//otiruでkoteiカウントのリセットに使う
+var tokuten=0;//得点を保持する
+
+
+var makeBlock = function(blo) {//ブロックを表示するための関数
+
+	var b=document.getElementById("board");//boardというidのタグを取得してbに代入する
+	var r=document.getElementById("aka");//赤い１マスをrに代入
+
+	imab=blo;//imabに落ちてくるブロックの外形を保存する
+
+
+	for(var y=0;y<=5;y++){//６×６の中で上の配列の中で１の時には赤いマスを表示する
+	for(var x=0;x<=5;x++){
+		if(blo[y][x]==1){
+			var c = r.cloneNode(true);//rをコピーしてcとする
+			c.style.left = (x * 32) + "px";//cのスタイル変化
+			c.style.top = (y * 32) + "px";
+			rokucp.appendChild(c);//rokuに実装することでcが可視化する。（原理不明ｗ）
+					//たぶんdivタグの中にdivタグを生成するイメージなんだと思う。
+		}	
+	}
+	}
+
+
+	b.appendChild(rokucp);//rokuに張り付いたブロックをbに貼り付ける
+
+};
+
+
+
+
+
+var makeField = function() {//フィールドを作る関数
+var b=document.getElementById("board");//boardというidのタグを取得してbに代入する
+var a=document.getElementById("midori");
+var a1=document.getElementById("kuro");
+
+	for(var y = 1; y <= 17; y++) {
+	for(var x = 1; x <= 19; x++) {
+
+		if(x<=2||x>=18||y>=16){//画面の中で黒くなる場所を描画
+			var c = a1.cloneNode(true);
+		}else{//画面の中で緑になる場所を描画
+			var c = a.cloneNode(true);
+		}
+
+		c.style.left = ((x - 1) * 32) + "px";
+		c.style.top = ((y - 1) * 32) + "px";
+
+		b.appendChild(c);//bに実装することでcが可視化する。（原理不明ｗ）
+	}
+	}
+
+};
+
+
+function kesu(){//消す処理
+	var e1=rokucp.childNodes;
+	var no=e1.length;
+	for(i=no-1;i>=0;i--){//大きいほうから消さないと削除した場所がつめられるから不具合が生じる。超悩んだ。
+		if(e1[i].id=="aka"){
+			rokucp.removeChild(e1[i])
+			
+		}
+	}
+};
+
+
+var syoumetu = function(){//消滅アルゴリズムこれも消滅に悩まされた。4:41 2011/03/09
+	//ブロックの消滅5:00 2011/03/09 一応完成
+	var count=0;
+	var b=document.getElementById("board");//boardというidのタグを取得してbに代入する
+	var e1=b.childNodes;
+
+	for(var y=5;y<=19;y++){//実際に使用する空間の幅と高さ
+	for(var x=2;x<=16;x++){
+		if(map[y][x]==0){//0であるということはブロックがないということなのでbreakする
+			count=0;
+			break;
+		}else{
+			count++;
+		}
+		if(count==15){//countが15になったら、ブロックが15個あるということなので消滅処理を行う
+
+			//ブロックのライン消滅処理
+			var no=e1.length;//ここでe1の数を考えないと消滅しているので情報の伝達に齟齬が発生するかもしれない。でも、聞いて。
+			for(var i=no-1;i>=0;i--){
+				if((e1[i].offsetTop== 32 * (y-5))&&(e1[i].id=="aka")){
+					b.removeChild(e1[i]);
+				}				
+			}
+
+			//ブロックの下がる処理
+			var no=e1.length;//再度取得しないと上で値が変わっている
+			for(var i=no-1;i>=0;i--){
+				if((e1[i].offsetTop < 32 * (y-5))&&(e1[i].id=="aka")){
+					e1[i].style.top=e1[i].offsetTop + 32 + "px";
+					//b.appendChild(e1[i]);
+				}				
+			}
+
+
+
+			//mapでの当たり判定の消滅改0:53 2011/03/10
+			for(var yyy=y;yyy>=5;yyy--){
+			for(var xxx=2;xxx<=16;xxx++){
+				map[yyy][xxx]=map[yyy-1][xxx];//自分のラインの上のラインの値を代入している
+			}
+			}
+
+			//ラインが消えたので得点が増える。
+			tenUp();
+		}
+	}
+	count=0;
+	}
+
+
+
+
+
+
+};
+
+var hozon = function(){//保存する処理2:50 2011/03/08
+
+//ブロックの当たり判定をmapに保存する
+	var l=rokucp.offsetLeft;//rokucpの座標を得ることにより、現在位置を把握する
+	var t=rokucp.offsetTop;
+	var han=[[],[],[],[],[],[]];
+	for(var y=0;y<=5;y++){
+	for(var x=0;x<=5;x++){
+		map[(t+160)/32+y][l/32+x]=map[(t+160)/32+y][l/32+x]+imab[y][x];//rokucpが現在いるところのmapにimabのブロックを上書き保存する。
+	}
+	}
+
+
+//マップ上にブロックを固定する処理
+	var b=document.getElementById("board");//boardというidのタグを取得してbに代入する
+	var r=document.getElementById("aka");//赤い１マスをrに代入
+
+
+	for(var y=0;y<=5;y++){
+	for(var x=0;x<=5;x++){
+		if(imab[y][x]==1){
+			var c = r.cloneNode(true);//rをコピーしてcとする
+			c.style.left = (x * 32)+l + "px";
+			c.style.top = (y * 32) + t + "px";
+			b.appendChild(c);
+		}	
+	}
+	}
+
+//ここにマップの範囲外のブロックと当たり判定を無くす処理を書く//書いたよ9:06 2011/03/12
+	for(var y=0;y<=4;y++){
+	for(var x=2;x<=16;x++){
+		map[y][x]=0;
+	}
+	}
+
+};
+
+var gameover = function(){//ゲームオーバーの処理9:38 2011/03/12
+	if(!hantei(5)){
+		alert("gameover\nあなたの点数は"+tokuten+"点でした。\n評価に値しない。\n再度挑戦したい場合はブラウザの更新ボタンを押してね。");
+		clearInterval(tid);//タイマーをとめることでブロックの落下や、ネクストブロックを防ぐ
+	}
+};
+
+var makeNextblock = function(){//ブロックが固定されたら、フォーカスを上にする2:59 2011/03/08 
+
+	//n=(n+1)%11;//後にランダムに変更する
+	var  n = Math.floor(Math.random()*11);//変更しました3:11 2011/03/09
+
+	kesu();
+	makeBlock(block[n]);
+	//makeBlock(block[11]);//デバッグ用
+
+
+
+	if(n<=3){
+		rokucp.style.top="-160px";//nの値というか、ブロックの形状によって初期の位置を変える
+		rokucp.style.left="160px";
+	}else{
+		if(n<=9){
+			rokucp.style.top="-128px";//nの値というか、ブロックの形状によって初期の位置を変える
+			rokucp.style.left="160px";
+		}else{
+			if(n>=10){
+				rokucp.style.top="-96px";//nの値というか、ブロックの形状によって初期の位置を変える
+				rokucp.style.left="160px";//3:06 2011/03/09
+			}
+		}
+	}
+
+	gameover();
+};
+
+
+
+var kaiten = function() {//回転アルゴリズム
+	var kari=[[],[],[],[],[],[],[]];
+	var r=document.getElementById("aka");//赤い１マスをrに代入
+
+	for(var y=0;y<=5;y++){
+	for(var x=0;x<=5;x++){
+		kari[y][x]=imab[x][5-y];//考えた結果この関係にあった。
+	}
+	}//上で変換したブロックを再描画する
+	
+	imab=kari;//imabに現在のブロックの形状を記憶させる
+	kesu();
+
+
+	for(var y=0;y<=5;y++){//６×６の中で上の配列の中で１の時には赤いマスを表示する
+	for(var x=0;x<=5;x++){
+		if(kari[y][x]==1){
+			var c = r.cloneNode(true);//rをコピーしてcとする
+			c.style.left = (x * 32) + "px";//cのスタイル変化
+			c.style.top = (y * 32) + "px";
+			rokucp.appendChild(c);//rokuに実装することでcが可視化する。（原理不明ｗ）
+					//たぶんdivタグの中にdivタグを生成するイメージなんだと思う。
+		}	
+	}
+	}
+};
+
+
+
+
+function otiru() {//落ちて、2秒経ったら固定される3:39 2011/03/08
+
+	if(hantei(4)){
+		rokucp.style.top =rokucp.offsetTop + 32+"px";//offsetTopで高さを取得することができる。
+	}else{
+		if(takasa==rokucp.offsetTop){
+			kotei++;
+		}
+	}
+	if(kotei>=2){
+		hozon();
+		makeNextblock();
+		syoumetu();
+		kotei=0;
+		takasa="";
+	}
+	takasa=rokucp.offsetTop;
+};
+
+
+function hantei(k){//当たり判定アルゴリズム
+
+	var l=rokucp.offsetLeft;//rokucpの座標を得ることにより、現在位置を把握する
+	var t=rokucp.offsetTop;
+	var han=[[],[],[],[],[],[]];
+	for(var y=0;y<=5;y++){
+	for(var x=0;x<=5;x++){
+		if(k==1){//回転
+			han[y][x]=map[(t+160)/32+y][l/32+x];//han[][]に現在rokucpがいるマップを代入
+			//回転、左、右の各場合において、2より大きくなるとぶつかったことになる
+			if(imab[x][5-y]+han[y][x]>=2){//回転後のimabと判別する
+				//alert("dame"+x+","+y);
+				return false;
+			}
+		}else{
+			if(k==2){//左
+				han[y][x]=map[(t+160)/32+y][l/32+x-1];
+			}
+			if(k==3){//右
+				han[y][x]=map[(t+160)/32+y][l/32+x+1];
+			}
+			if(k==4){//下
+				han[y][x]=map[(t+160)/32+y+1][l/32+x];
+			}
+			if(k==5){//新しいブロックの存在条件
+				han[y][x]=map[(t+160)/32+y][l/32+x];
+			}
+			//回転、左、右の各場合において、2より大きくなるとぶつかったことになる
+			if(imab[y][x]+han[y][x]>=2){
+				//alert("dame"+x+","+y);
+				if(k==4){//下ボタンを押してkoteiが２以上溜まったらブロックを保存する2:29 2011/03/09
+					kotei++;
+					if(kotei>=2){
+						hozon();
+						makeNextblock();
+						syoumetu();
+						kotei=0;
+						takasa="";
+					}
+				}
+				return false;
+			}
+		}
+	}
+	}
+	//alert();
+	return 1;
+	
+	
+};
+
+
+function ki(){//キーが押されたときに行う処理
+	if(((event.keyCode == 37)||(event.keyCode == 74))&&hantei(2)){//左
+		rokucp.style.left =rokucp.offsetLeft - 32+"px";
+	}
+
+	if(((event.keyCode ==76 )||(event.keyCode == 39))&&hantei(3)){//右
+		rokucp.style.left =rokucp.offsetLeft + 32 +"px";
+	}
+	if(((event.keyCode == 40)||(event.keyCode == 77))&&hantei(4)){//下
+		rokucp.style.top =rokucp.offsetTop + 32 +"px";
+	}
+
+	if(((event.keyCode == 13)||(event.keyCode == 90)||(event.keyCode == 75))&&hantei(1)){
+		kaiten();
+	}
+
+	if((event.keyCode == 65)){//aを押したときの処理。デバック用
+		tenUp();
+	}
+};
+
+
+function tenUp(){//得点を増やして表示する処理5:22 2011/03/12
+	var t=document.getElementById("ten");
+	tokuten=tokuten+100;
+	t.innerHTML=tokuten;
+};
+
+function menu(){//右側の部分を作成する処理
+
+	var m=document.getElementById("menu");
+	var n=document.getElementById("nextblockhint");
+	var m1=document.getElementById("menu1");
+	var m2=document.getElementById("menu2");
+	var m3=document.getElementById("menu3");
+	var b=document.getElementById("board");
+	
+	m.style.top="0px";
+	m.style.left="609px";
+	
+	n.style.top="20px";
+	n.style.left="629px";
+
+	m1.style.top="250px";
+	m1.style.left="629px";
+
+	m2.style.top="350px";
+	m2.style.left="629px";
+
+	m3.style.top="450px";
+	m3.style.left="629px";
+
+	b.appendChild(m);
+	b.appendChild(n);
+	b.appendChild(m1);
+	b.appendChild(m2);
+	b.appendChild(m3);
+
+	
+};
+
+
+//ここまで関数群//
+//ここからメインでやること//
+
+makeField();//フィールドを作る
+menu();
+makeNextblock();
+window.document.onkeydown = ki;//キーが押されたらこれが起動する//回転移動の処理
+
+var tid=setInterval("otiru()",1000);//1000msごとに落ちる処理が作動する。
+//clearInterval(tid)でやめることができる。
+
+
+
+
+
+
+
+
+
+
+//-->
+</script>
+
+
+
+
+</body></html>
+
+
